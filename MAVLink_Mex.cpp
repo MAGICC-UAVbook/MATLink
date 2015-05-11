@@ -141,8 +141,33 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
   mavlinkClass mavlink("/dev/ttyUSB0");
 
-  // Format and send the packet
-  // mavlink.send_vehicle_state(meh);
+  // Format and send the packet recieved from MATLAB to the PixHawk
+  mavlink_hil_vehicle_state_t vehicle_state;
+
+  vehicle_state.usec = 0.0f; // not sure what to do here
+  vehicle_state.position[0] = payload[0];
+  vehicle_state.position[1] = payload[1];
+  vehicle_state.position[2] = payload[2];
+  vehicle_state.Va    = payload[3];
+  vehicle_state.alpha = payload[4];
+  vehicle_state.beta  = payload[5];
+  vehicle_state.phi   = payload[6];
+  vehicle_state.theta = payload[7];
+  vehicle_state.psi   = payload[8];
+  vehicle_state.chi   = payload[9];
+  vehicle_state.p  = payload[10];
+  vehicle_state.q  = payload[11];
+  vehicle_state.r  = payload[12];
+  vehicle_state.Vg = payload[13];
+  vehicle_state.wn = payload[14];
+  vehicle_state.we = payload[15];
+  vehicle_state.quat[0] = payload[16];
+  vehicle_state.quat[1] = payload[17];
+  vehicle_state.quat[2] = payload[18];
+  vehicle_state.quat[3] = payload[19];
+  vehicle_state.quat_valid = (uint8_t)payload[20]; // this may give weird behavior
+
+  mavlink.send_vehicle_state(vehicle_state);
 
   // Receive packet and format the data
 
