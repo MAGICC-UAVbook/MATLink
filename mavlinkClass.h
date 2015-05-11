@@ -25,23 +25,7 @@ class mavlinkClass{
 		void handle_mavlink_msg();
     void handle_heartbeat();
     void handle_hil_controls();
-    void send_vehicle_state(uint64_t usec,
-                            float position[3],
-                            float Va,
-                            float alpha,
-                            float beta,
-                            float phi,
-                            float theta,
-                            float psi,
-                            float chi,
-                            float p,
-                            float q,
-                            float r,
-                            float Vg,
-                            float wn,
-                            float we,
-                            float quat[4],
-                            uint8_t quat_valid);
+    void send_vehicle_state(const mavlink_hil_vehicle_state_t &vehicle_state);
 
 		bool getClassStatus();
     void check_serial(); //!< check serial port for new messages

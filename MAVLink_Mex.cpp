@@ -14,6 +14,7 @@
 #include <time.h>
 //#include <cstdint>
 
+#include "include/mavlink/v1.0/MAGICC/mavlink.h"
 #include "mavlinkClass.h"
 
 /* Input Arguments */
@@ -142,6 +143,8 @@ void mexFunction( int nlhs, mxArray *plhs[],
   mavlinkClass mavlink("/dev/ttyUSB0");
 
   // Format and send the packet
+  mavlink_hil_vehicle_state_t vehicle_state;
+  // vehicle_state.meh = meh;
   // mavlink.send_vehicle_state(meh);
 
   // Receive packet and format the data
