@@ -41,49 +41,14 @@ void mavlinkClass::handle_hil_controls()
 {
 }
 
-void mavlinkClass::send_vehicle_state(uint64_t usec,
-                                      float position[3],
-                                      float Va,
-                                      float alpha,
-                                      float beta,
-                                      float phi,
-                                      float theta,
-                                      float psi,
-                                      float chi,
-                                      float p,
-                                      float q,
-                                      float r,
-                                      float Vg,
-                                      float wn,
-                                      float we,
-                                      float quat[],
-                                      uint8_t quat_valid)
+void mavlinkClass::send_vehicle_state(const mavlink_hil_vehicle_state_t &vehicle_state)
 {
   // send garbage
   uint8_t tt = 254;
   write(fd, &tt, 1);
 
   // pack message
-  mavlink_msg_hil_vehicle_state_pack(42,
-                                     0,
-                                     &msg,
-                                     usec,
-                                     position,
-                                     Va,
-                                     alpha,
-                                     beta,
-                                     phi,
-                                     theta,
-                                     psi,
-                                     chi,
-                                     p,
-                                     q,
-                                     r,
-                                     Vg,
-                                     wn,
-                                     we,
-                                     quat,
-                                     quat_valid);
+  mavlink_msg_hil_vehicle_state_encode(42, 0, &msg, &vehicle_state);
 
   // copy message to send buffer
   uint16_t len = mavlink_msg_to_send_buffer(buffy, &msg);

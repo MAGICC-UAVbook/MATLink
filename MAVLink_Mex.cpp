@@ -14,6 +14,7 @@
 #include <time.h>
 //#include <cstdint>
 
+#include "include/mavlink/v1.0/MAGICC/mavlink.h"
 #include "mavlinkClass.h"
 
 /* Input Arguments */
@@ -168,6 +169,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
   vehicle_state.quat_valid = (uint8_t)payload[20]; // this may give weird behavior
 
   mavlink.send_vehicle_state(vehicle_state);
+
 
   // Receive packet and format the data
 
