@@ -145,7 +145,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
   // Format and send the packet recieved from MATLAB to the PixHawk
   mavlink_hil_vehicle_state_t vehicle_state;
 
-  vehicle_state.usec = 0.0f; // not sure what to do here
+  vehicle_state.time_usec = 0.0f; // not sure what to do here
   vehicle_state.position[0] = payload[0];
   vehicle_state.position[1] = payload[1];
   vehicle_state.position[2] = payload[2];
