@@ -78,7 +78,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
     mwSize m_data,n_data; 
     int length, bytes;
 	double *pointer;
-	unsigned char *payload;
+	float *payload;
 
 	double m_size, n_size;
     
@@ -130,7 +130,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
 	pointer = mxGetPr(COMPONENT_ID);
 	messageHeader->componentID = (uint8_t)(*pointer);
 
-	payload = (unsigned char *)mxGetData(PAYLOAD);
+	payload = (float*)mxGetData(PAYLOAD);
 
 	// Init
 	if(!init)
@@ -145,45 +145,75 @@ void mexFunction( int nlhs, mxArray *plhs[],
   // Format and send the packet recieved from MATLAB to the PixHawk
   mavlink_hil_vehicle_state_t vehicle_state;
 
-  vehicle_state.time_usec = 0.0f; // not sure what to do here
-  vehicle_state.position[0] = payload[0];
-  vehicle_state.position[1] = payload[1];
-  vehicle_state.position[2] = payload[2];
-  vehicle_state.Va    = payload[3];
-  vehicle_state.alpha = payload[4];
-  vehicle_state.beta  = payload[5];
-  vehicle_state.phi   = payload[6];
-  vehicle_state.theta = payload[7];
-  vehicle_state.psi   = payload[8];
-  vehicle_state.chi   = payload[9];
-  vehicle_state.p  = payload[10];
-  vehicle_state.q  = payload[11];
-  vehicle_state.r  = payload[12];
-  vehicle_state.Vg = payload[13];
-  vehicle_state.wn = payload[14];
-  vehicle_state.we = payload[15];
-  vehicle_state.quat[0] = payload[16];
-  vehicle_state.quat[1] = payload[17];
-  vehicle_state.quat[2] = payload[18];
-  vehicle_state.quat[3] = payload[19];
-  vehicle_state.quat_valid = (uint8_t)payload[20]; // this may give weird behavior
+  vehicle_state.time_usec = 0.0f; // not sure what to do here, overwrite whatever MATLAB gives to us with a zero
+  vehicle_state.position[0] = payload[1];
+  vehicle_state.position[1] = payload[2];
+  vehicle_state.position[2] = payload[3];
+  vehicle_state.Va    = payload[4];
+  vehicle_state.alpha = payload[5];
+  vehicle_state.beta  = payload[6];
+  vehicle_state.phi   = payload[7];
+  vehicle_state.theta = payload[8];
+  vehicle_state.psi   = payload[9];
+  vehicle_state.chi   = payload[10];
+  vehicle_state.p  = payload[11];
+  vehicle_state.q  = payload[12];
+  vehicle_state.r  = payload[13];
+  vehicle_state.Vg = payload[14];
+  vehicle_state.wn = payload[15];
+  vehicle_state.we = payload[16];
+  vehicle_state.quat[0] = payload[17];
+  vehicle_state.quat[1] = payload[18];
+  vehicle_state.quat[2] = payload[19];
+  vehicle_state.quat[3] = payload[20];
+  vehicle_state.quat_valid = (uint8_t)payload[21]; // this may give weird behavior
 
   mavlink.send_vehicle_state(vehicle_state);
 
 
   // Receive packet and format the data
+  message_type = "hil_vehicle_state";
+  sequence_number = 1;
+  system_id = 1;
+  component_id = 2;
+  mavlink_hil_vehicle_state_t received_vehicle_state; // pull data from MAVLINK functions
 
 
-	// create output data structures
-	MESSAGE_TYPE_OUT = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL);
-	SEQUENCE_NUMBER_OUT = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL);
-	SYSTEM_ID_OUT = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL);
-	COMPONENT_ID_OUT = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL);
-	PAYLOAD_OUT = mxCreateNumericMatrix(256, 1, mxDOUBLE_CLASS, mxREAL); // max possible number of payload parameters
+  // create output data structures
+  MESSAGE_TYPE_OUT = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL);
+  SEQUENCE_NUMBER_OUT = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL);
+  SYSTEM_ID_OUT = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL);
+  COMPONENT_ID_OUT = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL);
+  PAYLOAD_OUT = mxCreateNumericMatrix(256, 1, mxDOUBLE_CLASS, mxREAL); // max possible number of payload parameters
+  
+  // populate data structures
+  float* payload_out = (float*)mxGetData(PAYLOAD_OUT);
+  
+  payload_out[0] = received_vehicle_state.time_usec;
+  payload_out[1] = received_vehicle_state.position[0];
+  payload_out[2] = received_vehicle_state.position[1];
+  payload_out[3] = received_vehicle_state.position[2];
+  payload_out[4] = received_vehicle_state.Va;
+  payload_out[5] = received_vehicle_state.alpha;
+  payload_out[6] = received_vehicle_state.beta;
+  payload_out[7] = received_vehicle_state.phi;
+  payload_out[8] = received_vehicle_state.theta;
+  payload_out[9] = received_vehicle_state.psi;
+  payload_out[10] = received_vehicle_state.chi;
+  payload_out[11] = received_vehicle_state.p;
+  payload_out[12]= received_vehicle_state.q;
+  payload_out[13] = received_vehicle_state.r;
+  payload_out[14] = received_vehicle_state.Vg;
+  payload_out[15] = received_vehicle_state.wn;
+  payload_out[16] = received_vehicle_state.we;
+  payload_out[17] = received_vehicle_state.quat[0];
+  payload_out[18] = received_vehicle_state.quat[1];
+  payload_out[19] = received_vehicle_state.quat[2];
+  payload_out[20] = received_vehicle_state.quat[3];
+  payload_out[21] = received_vehicle_state.quat_valid;
 
-	// populate data structures
 
 
-	delete messageHeader;
-    mexUnlock();
+  delete messageHeader;
+  mexUnlock();
 }
