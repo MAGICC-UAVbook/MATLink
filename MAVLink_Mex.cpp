@@ -148,7 +148,25 @@ void mexFunction( int nlhs, mxArray *plhs[],
   // mavlink.send_vehicle_state(meh);
 
   // Receive packet and format the data
+  mavlink_message_t msg;
+  bool new_message = mavlink.check_serial(&msg);
 
+  if (new_message)
+  {
+    switch (msg.msgid)
+    {
+    case MAVLINK_MSG_ID_HIL_CONTROLS:
+      mavlink_hil_controls_t controls;
+      mavlink_msg_hil_controls_decode(&msg, &controls);
+
+      // float meh = controls.meh; etc.
+
+      break;
+    default:
+      // do nothing with unsupported message types
+      break;
+    }
+  }
 
 	// create output data structures
 	MESSAGE_TYPE_OUT = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL);
