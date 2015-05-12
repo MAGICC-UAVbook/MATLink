@@ -177,6 +177,13 @@ void mexFunction( int nlhs, mxArray *plhs[],
   COMPONENT_ID_OUT = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL);
   PAYLOAD_OUT = mxCreateNumericMatrix(256, 1, mxDOUBLE_CLASS, mxREAL); // max possible number of payload parameters
 
+  // Create pointers to access output arrays
+  char* message_type = (char*)mxGetData(MESSAGE_TYPE_OUT);
+  float* sequence_number = (float*)mxGetData(SEQUENCE_NUMBER_OUT);
+  float* system_id = (float*)mxGetData(SYSTEM_ID_OUT);
+  float* component_id = (float*)mxGetData(COMPONENT_ID_OUT);
+  float* payload_out = (float*)mxGetData(PAYLOAD_OUT);
+
   // Receive packet and format the data
   mavlink_message_t msg;
   bool new_message = mavlink.check_serial(&msg);
@@ -187,39 +194,25 @@ void mexFunction( int nlhs, mxArray *plhs[],
     {
     case MAVLINK_MSG_ID_HIL_CONTROLS:
       message_type = "hil_controls";
-      sequence_number = msg.seq;
-      system_id = msg.sysid;
-      component_id = msg.compid;
+      *sequence_number = msg.seq;
+      *system_id = msg.sysid;
+      *component_id = msg.compid;
 
       mavlink_hil_controls_t controls;
       mavlink_msg_hil_controls_decode(&msg, &controls);
 
-      // float meh = controls.meh; etc.
       // populate data structures
-      float* payload_out = (float*)mxGetData(PAYLOAD_OUT);
-
-//      payload_out[0] = received_vehicle_state.time_usec;
-//      payload_out[1] = received_vehicle_state.position[0];
-//      payload_out[2] = received_vehicle_state.position[1];
-//      payload_out[3] = received_vehicle_state.position[2];
-//      payload_out[4] = received_vehicle_state.Va;
-//      payload_out[5] = received_vehicle_state.alpha;
-//      payload_out[6] = received_vehicle_state.beta;
-//      payload_out[7] = received_vehicle_state.phi;
-//      payload_out[8] = received_vehicle_state.theta;
-//      payload_out[9] = received_vehicle_state.psi;
-//      payload_out[10] = received_vehicle_state.chi;
-//      payload_out[11] = received_vehicle_state.p;
-//      payload_out[12]= received_vehicle_state.q;
-//      payload_out[13] = received_vehicle_state.r;
-//      payload_out[14] = received_vehicle_state.Vg;
-//      payload_out[15] = received_vehicle_state.wn;
-//      payload_out[16] = received_vehicle_state.we;
-//      payload_out[17] = received_vehicle_state.quat[0];
-//      payload_out[18] = received_vehicle_state.quat[1];
-//      payload_out[19] = received_vehicle_state.quat[2];
-//      payload_out[20] = received_vehicle_state.quat[3];
-//      payload_out[21] = received_vehicle_state.quat_valid;
+     payload_out[0] = controls.time_usec;
+     payload_out[1] = controls.roll_ailerons;
+     payload_out[2] = controls.pitch_elevator;
+     payload_out[3] = controls.yaw_rudder;
+     payload_out[4] = controls.throttle;
+     payload_out[5] = controls.aux1;
+     payload_out[6] = controls.aux2;
+     payload_out[7] = controls.aux3;
+     payload_out[8] = controls.aux4;
+     payload_out[9] = (float)controls.mode;
+     payload_out[10] = (float)controls.nav_mode;
 
       break;
     default:
