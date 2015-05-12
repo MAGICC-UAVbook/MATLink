@@ -179,10 +179,10 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
   // Create pointers to access output arrays
   char* message_type = (char*)mxGetData(MESSAGE_TYPE_OUT);
-  float* sequence_number = (float*)mxGetData(SEQUENCE_NUMBER_OUT);
-  float* system_id = (float*)mxGetData(SYSTEM_ID_OUT);
-  float* component_id = (float*)mxGetData(COMPONENT_ID_OUT);
-  float* payload_out = (float*)mxGetData(PAYLOAD_OUT);
+  double* sequence_number = (double*)mxGetData(SEQUENCE_NUMBER_OUT);
+  double* system_id = (double*)mxGetData(SYSTEM_ID_OUT);
+  double* component_id = (double*)mxGetData(COMPONENT_ID_OUT);
+  double* payload_out = (double*)mxGetData(PAYLOAD_OUT);
 
   // Receive packet and format the data
   mavlink_message_t msg;
@@ -202,17 +202,17 @@ void mexFunction( int nlhs, mxArray *plhs[],
       mavlink_msg_hil_controls_decode(&msg, &controls);
 
       // populate data structures
-     payload_out[0] = controls.time_usec;
-     payload_out[1] = controls.roll_ailerons;
-     payload_out[2] = controls.pitch_elevator;
-     payload_out[3] = controls.yaw_rudder;
-     payload_out[4] = controls.throttle;
-     payload_out[5] = controls.aux1;
-     payload_out[6] = controls.aux2;
-     payload_out[7] = controls.aux3;
-     payload_out[8] = controls.aux4;
-     payload_out[9] = (float)controls.mode;
-     payload_out[10] = (float)controls.nav_mode;
+      payload_out[0] = controls.time_usec;
+      payload_out[1] = controls.roll_ailerons;
+      payload_out[2] = controls.pitch_elevator;
+      payload_out[3] = controls.yaw_rudder;
+      payload_out[4] = controls.throttle;
+      payload_out[5] = controls.aux1;
+      payload_out[6] = controls.aux2;
+      payload_out[7] = controls.aux3;
+      payload_out[8] = controls.aux4;
+      payload_out[9] = (double)controls.mode;
+      payload_out[10] = (double)controls.nav_mode;
 
       break;
     default:
