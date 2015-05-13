@@ -62,8 +62,10 @@ bool mavlinkClass::check_serial(mavlink_message_t *msg){
         memcpy(msg, &msg_, sizeof(&msg_)); // copy message data to output variable
         return true;
       }
-		}
-	}
+    }
+  }
+
+  return false;
 }
 
 int mavlinkClass::flush_buffer(){
