@@ -24,6 +24,7 @@ int main(int argc, char* argv[])
 
   for (;;)
   {
+    vehicle_state.q += 0.1;
     mavlink.send_vehicle_state(vehicle_state);
 
     mavlink_message_t msg;
