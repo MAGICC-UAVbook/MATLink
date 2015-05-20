@@ -55,14 +55,25 @@ static void mdlInitializeSizes(SimStruct *S)
     ssSetOptions(S, SS_OPTION_EXCEPTION_FREE_CODE); // again, not sure what this does... we might not want to do this.
 
 
-    /********************************/
-    /* Set size of the work vectors */
-    /********************************/
+    /**************************/
+    /* Configure work vectors */
+    /**************************/
+    ssSetNumDWork(         S, 1);   /* number of DWork Vectors (persistent memory) */
     ssSetNumRWork(         S, 0);   /* number of real work vector elements   */
     ssSetNumIWork(         S, 0);   /* number of integer work vector elements*/
-    ssSetNumPWork(         S, 0);   /* number of pointer work vector elements*/
+    ssSetNumPWork(         S, 1);   /* number of pointer work vector elements*/
     ssSetNumModes(         S, 0);   /* number of mode work vector elements   */
     ssSetNumNonsampledZCs( S, 0);   /* number of nonsampled zero crossings   */
+ 
+    /**
+     * Definition of the Work Vectors:
+     * Dwork0 -> 256 doubles - stores mavlink payload
+     * Pwork -> 3 pointers - access to serial threads
+     */
+    // ssSetDworkWidth(S, 0, 256);
+    // ssSetDworkDataType(S, 0, SS_DOUBLE);
+    // ssSetDworkName(S, 0, "payload_data");
+
 
 
 
@@ -72,8 +83,15 @@ static void mdlInitializeSizes(SimStruct *S)
     // define serial port
     // create vehicle state message
     // initialize data communication
+}
 
-
+static void mdlStart(SimStruct *S)
+{
+    real_T *payload_data = (real_T*) ssGetDWork(S,0);
+    for(int i = 1; i<ssGetDWorkWidth(S,0);i++)
+    {
+        payload_data[i] = 0.0; // set it all to zeros to avoid weird returns
+    }
 }
 static void mdlInitializeSampleTimes(SimStruct *S)
 {
