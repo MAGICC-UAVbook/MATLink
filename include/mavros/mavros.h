@@ -50,6 +50,8 @@ public:
     explicit MavRos(char* serialName);
     ~MavRos() {mav_uas.stop();}
 
+    mavlink_hil_controls_t hil_controls_;
+
     void spinOnce(mavlink_hil_vehicle_state_t vehicle_state);
 private:
     //ros::NodeHandle node_handle;

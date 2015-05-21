@@ -119,6 +119,19 @@ MavRos::MavRos(char* serialName) //:
 		startup_px4_usb_quirk();
 
     std::cout << "MAVROS started. MY ID [" <<  system_id << ", " << component_id << "], TARGET ID [" << tgt_system_id << ", "<< tgt_component_id << "]" <<  std::endl;
+
+    // reset the state member hil_controls so that it doesn't output weird stuff
+    hil_controls_.time_usec = 0;
+    hil_controls_.roll_ailerons = 0;
+    hil_controls_.pitch_elevator =  0;
+    hil_controls_.yaw_rudder = 0;
+    hil_controls_.throttle = 0;
+    hil_controls_.aux1 = 0;
+    hil_controls_.aux2 = 0;
+    hil_controls_.aux3 = 0;
+    hil_controls_.aux4 = 0;
+    hil_controls_.mode = 0;
+    hil_controls_.nav_mode = 0;
 }
 
 void MavRos::spinOnce(mavlink_hil_vehicle_state_t vs)
@@ -153,11 +166,8 @@ void MavRos::mavlink_receive(const mavlink_message_t *mmsg, uint8_t sysid, uint8
     std::cout << "received message, id: " << (int)mmsg->msgid;
     if(mmsg->msgid == MAVLINK_MSG_ID_HIL_CONTROLS)
     {
-        mavlink_hil_controls_t mhc;
-        mavlink_msg_hil_controls_decode(mmsg, &mhc);
-        std::cout << ": " << mhc.roll_ailerons << ", " << mhc.pitch_elevator << ", " << mhc.yaw_rudder << ", " << mhc.throttle;
+        mavlink_msg_hil_controls_decode(mmsg, &hil_controls_);
     }
-    std::cout << std::endl;
 }
 
 void MavRos::mavlink_send(mavlink_message_t mmsg) {

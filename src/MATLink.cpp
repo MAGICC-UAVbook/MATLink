@@ -15,6 +15,8 @@
 
 #define NUM_PARAMS (0)
 
+mavros::MavRos* MATLink;
+
 static void mdlInitializeSizes(SimStruct *S)
 {
     // sets the number of parameters that the S-Function Has.
@@ -76,7 +78,7 @@ static void mdlInitializeSizes(SimStruct *S)
     /* SET UP MAVLINK COMMUNICTION */
     /*******************************/
     char port[] = "/dev/ttyUSB0";
-    mavros::MavRos mavros(port);
+    MATLink = new mavros::MavRos(port);
 }
 
 
@@ -98,68 +100,81 @@ static void mdlInitializeSampleTimes(SimStruct *S)
 
 static void mdlOutputs(SimStruct *S, int_T tid)
 {
-    /*
-     * Structure of Input
-     * MESSAGE_ID
-     */
+    /**************/
+    /* Grab Input */
+    /**************/
 
-     /**************/
-     /* Grab Input */
-     /**************/
-     InputRealPtrsType uPtrs = ssGetInputPortRealSignalPtrs(S,0); // this returns a pointer to the data on the input port
-     int_T message_type = (int_T) *uPtrs[0];
-     real_T t  =          *uPtrs[1];
-     real_T pn =          *uPtrs[2];
-     real_T pe =          *uPtrs[3];
-     real_T h =           *uPtrs[4];
-     real_T u =           *uPtrs[5];
-     real_T v =           *uPtrs[6];
-     real_T w =           *uPtrs[7];
-     real_T alpha =       *uPtrs[8];
-     real_T beta  =       *uPtrs[9];
-     real_T phi =         *uPtrs[10];
-     real_T theta =       *uPtrs[11];
-     real_T psi =         *uPtrs[12];
-     real_T p =           *uPtrs[13];
-     real_T q =           *uPtrs[14];
-     real_T r =           *uPtrs[15];
-     real_T gamma =       *uPtrs[16];
-     real_T chi =         *uPtrs[17];
-     real_T wn =          *uPtrs[18];
-     real_T we =          *uPtrs[19];
-     real_T wd =          *uPtrs[20];
+    mavlink_hil_vehicle_state_t vehicle_state;
+    mavlink_hil_controls_t controls;
 
-     /*******************/
-     /* Send on MAVLINK */
-     /*******************/
+    InputRealPtrsType uPtrs = ssGetInputPortRealSignalPtrs(S,0); // this returns a pointer to the data on the input por;
+    int_T message_type = (int_T) *uPtrs[0];
+    vehicle_state.time_usec = (uint64_t)*uPtrs[1];
+    vehicle_state.position[0] = *uPtrs[2];
+    vehicle_state.position[1] = *uPtrs[3];
+    vehicle_state.position[2] = *uPtrs[4];
+    vehicle_state.Va =          *uPtrs[5];
+    vehicle_state.alpha =       *uPtrs[6];
+    vehicle_state.beta  =       *uPtrs[7];
+    vehicle_state.phi =         *uPtrs[8];
+    vehicle_state.theta =       *uPtrs[9];
+    vehicle_state.psi =         *uPtrs[10];
+    vehicle_state.chi =         *uPtrs[11];
+    vehicle_state.p =           *uPtrs[12];
+    vehicle_state.q =           *uPtrs[13];
+    vehicle_state.r =           *uPtrs[14];
+    vehicle_state.Vg =          *uPtrs[15]; 
+    vehicle_state.wn =          *uPtrs[16];
+    vehicle_state.we =          *uPtrs[17];
+    vehicle_state.quat[0]     = *uPtrs[18];
+    vehicle_state.quat[1]     = *uPtrs[19];
+    vehicle_state.quat[0]     = *uPtrs[20];
+    vehicle_state.quat[1]     = *uPtrs[21];
 
-     /************************/
-     /* Receive from MAVLINK */
-     /************************/
+    MATLink->spinOnce(vehicle_state);
 
-     /********************************************/
-     /* Pack Received message into Output Vector */
-     /********************************************/
-     int_T message_output_type = 1;
-     real_T output_time = 0.0;
-     real_T roll_ailerons = 5.0;
-     real_T pitch_elevator = 15.0;
-     real_T yaw_rudder = 500.0;
-     real_T throttle = 1000.0;
+    /************************/
+    /* Receive from MAVLINK */
+    /************************/
 
-     real_T *out = ssGetOutputPortRealSignal(S,0);
-     out[0] = (real_T) message_output_type;
-     out[1] = output_time;
-     out[2] = roll_ailerons;
-     out[3] = pitch_elevator;
-     out[4] = yaw_rudder;
-     out[5] = throttle;
+    // check if a new message has arrived
+    controls.time_usec       = MATLink->hil_controls_.time_usec;
+    controls.roll_ailerons   = MATLink->hil_controls_.roll_ailerons;
+    controls.pitch_elevator  = MATLink->hil_controls_.pitch_elevator ;
+    controls.yaw_rudder      = MATLink->hil_controls_.yaw_rudder;
+    controls.throttle        = MATLink->hil_controls_.throttle;
+    controls.aux1            = MATLink->hil_controls_.aux1;
+    controls.aux2            = MATLink->hil_controls_.aux2;
+    controls.aux3            = MATLink->hil_controls_.aux3;
+    controls.aux4            = MATLink->hil_controls_.aux4;
+    controls.mode            = MATLink->hil_controls_.mode;
+    controls.nav_mode        = MATLink->hil_controls_.nav_mode;
+
+    /********************************************/
+    /* Pack Received message into Output Vector */
+    /********************************************/
+    real_T *out = ssGetOutputPortRealSignal(S,0);
+    out[1] = controls.time_usec;
+    out[2] = controls.roll_ailerons;
+    out[3] = controls.pitch_elevator;
+    out[4] = controls.yaw_rudder;
+    out[5] = controls.throttle;
+    out[6] = controls.aux1;
+    out[7] = controls.aux2;
+    out[8] = controls.aux3;
+    out[9] = controls.aux4;
+    out[10] = controls.mode;
+    out[11] = controls.nav_mode;
 }
 
 
 static void mdlTerminate(SimStruct *S)
 {
+  delete MATLink;
 }
+
+
+
 
 
 /* Required S-function trailer */

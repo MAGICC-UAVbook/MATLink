@@ -262,7 +262,9 @@ add_library(${CPP_FILE} SHARED ${CPP_FILE_NAME} ${CMAKE_SOURCE_DIR}/Matlabdef.de
   src/mavconn/mavconn_udp.cpp
   src/mavconn/mavconn_tcp.cpp
   src/lib/uas.cpp
-  src/lib/mavros.cpp)
+  src/lib/mavros.cpp
+  include/mavros/mavros.h
+  )
 #add_dependencies(${CPP_FILE} mavros mavconn)
 target_link_libraries(${CPP_FILE} ${MATLAB_LIBRARIES} ${Boost_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT}
