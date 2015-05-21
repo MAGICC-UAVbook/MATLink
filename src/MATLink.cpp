@@ -10,7 +10,8 @@
 #define S_FUNCTION_NAME MATLink
 #define S_FUNCTION_LEVEL 2
 
-#include "simstruc.h"
+#include <simstruc.h>
+#include "mavros/mavros.h"
 
 #define NUM_PARAMS (0)
 
@@ -74,10 +75,8 @@ static void mdlInitializeSizes(SimStruct *S)
     /*******************************/
     /* SET UP MAVLINK COMMUNICTION */
     /*******************************/
-    // define serial port
-    // create vehicle state message
-    // initialize data communication
-    // save pointers to the PWork Vector
+    char port[] = "/dev/ttyUSB0";
+    //mavros::MavRos mavros(port);
 }
 
 
