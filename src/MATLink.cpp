@@ -76,7 +76,7 @@ static void mdlInitializeSizes(SimStruct *S)
     /* SET UP MAVLINK COMMUNICTION */
     /*******************************/
     char port[] = "/dev/ttyUSB0";
-    //mavros::MavRos mavros(port);
+    mavros::MavRos mavros(port);
 }
 
 

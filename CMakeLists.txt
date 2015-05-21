@@ -44,6 +44,7 @@ ENDIF(MATLAB_FOUND)
 
 #SET(GCC_LINK_FLAGS "-fPIC")
 #SET( CMAKEMODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS} ${GCC_LINK_FLAGS}" )
+SET(CMAKE_STATIC_LINKER_FLAGS "-fP")
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -191,11 +192,11 @@ add_library(mavros
   src/lib/mavros.cpp
 #  src/lib/mavlink_diag.cpp
 )
+#set_target_properties(mavros PROPERTIES LINK_FLAGS -fPIC)
 add_dependencies(mavros
   #mavros_generate_messages_cpp
   mavconn
 )
-set_target_properties(mavros PROPERTIES LINK_FLAGS -fPIC)
 target_link_libraries(mavros
   mavconn
   #${catkin_LIBRARIES}
@@ -255,9 +256,17 @@ set(CPP_FILE MATLink)
 # set up matlab libraries
 set(CPP_FILE_NAME src/${CPP_FILE}.cpp)
 INCLUDE_DIRECTORIES(${MATLAB_INCLUDE_DIR} ${SIMULINK_INCLUDE_DIR})
-add_library(${CPP_FILE} SHARED ${CPP_FILE_NAME} ${CMAKE_SOURCE_DIR}/Matlabdef.def)
-add_dependencies(${CPP_FILE} mavros mavconn)
-target_link_libraries(${CPP_FILE} ${MATLAB_LIBRARIES} mavros)
+add_library(${CPP_FILE} SHARED ${CPP_FILE_NAME} ${CMAKE_SOURCE_DIR}/Matlabdef.def
+  src/mavconn/mavconn_interface.cpp
+  src/mavconn/mavconn_serial.cpp
+  src/mavconn/mavconn_udp.cpp
+  src/mavconn/mavconn_tcp.cpp
+  src/lib/uas.cpp
+  src/lib/mavros.cpp)
+#add_dependencies(${CPP_FILE} mavros mavconn)
+target_link_libraries(${CPP_FILE} ${MATLAB_LIBRARIES} ${Boost_LIBRARIES}
+  ${CMAKE_THREAD_LIBS_INIT}
+)#mavros)
 
 # 32-bit or 64-bit mex
 if(WIN32)
