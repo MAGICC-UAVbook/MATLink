@@ -47,11 +47,14 @@ namespace mavros {
 class MavRos
 {
 public:
-    explicit MavRos(char* serialName);
+    explicit 
+    MavRos();
+
     ~MavRos() {mav_uas.stop();}
 
     mavlink_hil_controls_t hil_controls_;
 
+    void init(char* serialName);
     void spinOnce(mavlink_hil_vehicle_state_t vehicle_state);
 private:
     //ros::NodeHandle node_handle;

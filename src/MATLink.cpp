@@ -15,8 +15,6 @@
 
 #define NUM_PARAMS (0)
 
-mavros::MavRos* MATLink;
-
 static void mdlInitializeSizes(SimStruct *S)
 {
     // sets the number of parameters that the S-Function Has.
@@ -55,10 +53,31 @@ static void mdlInitializeSizes(SimStruct *S)
     /* specify the sim state compliance to be same as a built-in block */
     //ssSetSimStateCompliance(S, USE_DEFAULT_SIM_STATE);
 
+    mavros::MavRos* pMATLink = new mavros::MavRos();
 
     /**************************/
     /* Configure work vectors */
     /**************************/
+    DTypeId MATLINK_ID = ssRegisterDataType(S, "ml");
+    if(MATLINK_ID == INVALID_DTYPE_ID) return;
+    if(!ssSetDataTypeSize(S,MATLINK_ID,sizeof(mavros::MavRos))) return;
+    if(!ssSetDataTypeZero(S,MATLINK_ID,pMATLink)) return;
+
+    //delete pMATLink;
+
+    ssSetNumDWork(S,1);
+    ssSetDWorkDataType(S,0,MATLINK_ID);
+    ssSetDWorkWidth(S,0,1);
+
+
+    /*******************************/
+    /* SET UP MAVLINK COMMUNICTION */
+    /*******************************/
+    char port[] = "/dev/ttyUSB0";
+    pMATLink = (mavros::MavRos*) ssGetDWork(S,0);
+    pMATLink->init(port);
+
+
     //ssSetNumDWork(         S, 1);   /* number of DWork Vectors (persistent memory) */
     //ssSetNumRWork(         S, 0);   /* number of real work vector elements   */
     //ssSetNumIWork(         S, 0);   /* number of integer work vector elements*/
@@ -74,16 +93,13 @@ static void mdlInitializeSizes(SimStruct *S)
     // ssSetDworkDataType(S, 0, SS_DOUBLE);
     // ssSetDworkName(S, 0, "payload_data");
 
-    /*******************************/
-    /* SET UP MAVLINK COMMUNICTION */
-    /*******************************/
-    char port[] = "/dev/ttyUSB0";
-    MATLink = new mavros::MavRos(port);
+    
 }
 
 
 static void mdlStart(SimStruct *S)
 {
+    mexLock();
     real_T *payload_data = (real_T*) ssGetDWork(S,0);
     for(int i = 1; i<ssGetDWorkWidth(S,0);i++)
     {
@@ -101,6 +117,11 @@ static void mdlInitializeSampleTimes(SimStruct *S)
 static void mdlOutputs(SimStruct *S, int_T tid)
 {
     /**************/
+    /* Get MATLINK out of DWork */
+    /**************/
+    mavros::MavRos* pMATLink = (mavros::MavRos*) ssGetDWork(S,0);
+
+    /**************/
     /* Grab Input */
     /**************/
 
@@ -109,51 +130,74 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 
     InputRealPtrsType uPtrs = ssGetInputPortRealSignalPtrs(S,0); // this returns a pointer to the data on the input por;
     int_T message_type = (int_T) *uPtrs[0];
-    vehicle_state.time_usec = (uint64_t)*uPtrs[1];
-    vehicle_state.position[0] = *uPtrs[2];
-    vehicle_state.position[1] = *uPtrs[3];
-    vehicle_state.position[2] = *uPtrs[4];
-    vehicle_state.Va =          *uPtrs[5];
-    vehicle_state.alpha =       *uPtrs[6];
-    vehicle_state.beta  =       *uPtrs[7];
-    vehicle_state.phi =         *uPtrs[8];
-    vehicle_state.theta =       *uPtrs[9];
-    vehicle_state.psi =         *uPtrs[10];
-    vehicle_state.chi =         *uPtrs[11];
-    vehicle_state.p =           *uPtrs[12];
-    vehicle_state.q =           *uPtrs[13];
-    vehicle_state.r =           *uPtrs[14];
-    vehicle_state.Vg =          *uPtrs[15]; 
-    vehicle_state.wn =          *uPtrs[16];
-    vehicle_state.we =          *uPtrs[17];
-    vehicle_state.quat[0]     = *uPtrs[18];
-    vehicle_state.quat[1]     = *uPtrs[19];
-    vehicle_state.quat[0]     = *uPtrs[20];
-    vehicle_state.quat[1]     = *uPtrs[21];
+    //vehicle_state.time_usec = (uint64_t)*uPtrs[1];
+    //vehicle_state.position[0] = *uPtrs[2];
+    //vehicle_state.position[1] = *uPtrs[3];
+    //vehicle_state.position[2] = *uPtrs[4];
+    //vehicle_state.Va =          *uPtrs[5];
+    //vehicle_state.alpha =       *uPtrs[6];
+    //vehicle_state.beta  =       *uPtrs[7];
+    //vehicle_state.phi =         *uPtrs[8];
+    //vehicle_state.theta =       *uPtrs[9];
+    //vehicle_state.psi =         *uPtrs[10];
+    //vehicle_state.chi =         *uPtrs[11];
+    //vehicle_state.p =           *uPtrs[12];
+    //vehicle_state.q =           *uPtrs[13];
+    //vehicle_state.r =           *uPtrs[14];
+    //vehicle_state.Vg =          *uPtrs[15]; 
+    //vehicle_state.wn =          *uPtrs[16];
+    //vehicle_state.we =          *uPtrs[17];
+    //vehicle_state.quat[0]     = *uPtrs[18];
+    //vehicle_state.quat[1]     = *uPtrs[19];
+    //vehicle_state.quat[2]     = *uPtrs[20];
+    //vehicle_state.quat[3]     = *uPtrs[21];
 
-    MATLink->spinOnce(vehicle_state);
+    vehicle_state.time_usec = 1;
+    vehicle_state.position[0] = 1.0;
+    vehicle_state.position[1] =1.0;
+    vehicle_state.position[2] =1.0;
+    vehicle_state.Va =         1.0;
+    vehicle_state.alpha =      1.0;
+    vehicle_state.beta  =      1.0;
+    vehicle_state.phi =        1.0;
+    vehicle_state.theta =      1.0;
+    vehicle_state.psi =         1.0;
+    vehicle_state.chi =         1.0;
+    vehicle_state.p =           1.0;
+    vehicle_state.q =           1.0;
+    vehicle_state.r =           1.0;
+    vehicle_state.Vg =          1.0;
+    vehicle_state.wn =          1.0;
+    vehicle_state.we =          1.0;
+    vehicle_state.quat[0]     = 0.0;
+    vehicle_state.quat[1]     = 0.0;
+    vehicle_state.quat[2]     = 0.0;
+    vehicle_state.quat[3]     = 1.0;
+//
+    // pMATLink->spinOnce(vehicle_state); // this line crashes simulink
 
     /************************/
     /* Receive from MAVLINK */
     /************************/
 
     // check if a new message has arrived
-    controls.time_usec       = MATLink->hil_controls_.time_usec;
-    controls.roll_ailerons   = MATLink->hil_controls_.roll_ailerons;
-    controls.pitch_elevator  = MATLink->hil_controls_.pitch_elevator ;
-    controls.yaw_rudder      = MATLink->hil_controls_.yaw_rudder;
-    controls.throttle        = MATLink->hil_controls_.throttle;
-    controls.aux1            = MATLink->hil_controls_.aux1;
-    controls.aux2            = MATLink->hil_controls_.aux2;
-    controls.aux3            = MATLink->hil_controls_.aux3;
-    controls.aux4            = MATLink->hil_controls_.aux4;
-    controls.mode            = MATLink->hil_controls_.mode;
-    controls.nav_mode        = MATLink->hil_controls_.nav_mode;
+    controls.time_usec = pMATLink->hil_controls_.time_usec;
+    controls.roll_ailerons = pMATLink->hil_controls_.roll_ailerons;
+    controls.pitch_elevator = pMATLink->hil_controls_.pitch_elevator;
+    controls.yaw_rudder = pMATLink->hil_controls_.yaw_rudder;
+    controls.throttle = pMATLink->hil_controls_.throttle;
+    controls.aux1 = pMATLink->hil_controls_.aux1;
+    controls.aux2 = pMATLink->hil_controls_.aux2;
+    controls.aux3 = pMATLink->hil_controls_.aux3;
+    controls.aux4 = pMATLink->hil_controls_.aux4;
+    controls.mode = pMATLink->hil_controls_.mode;
+    controls.nav_mode = pMATLink->hil_controls_.nav_mode;
 
     /********************************************/
     /* Pack Received message into Output Vector */
     /********************************************/
     real_T *out = ssGetOutputPortRealSignal(S,0);
+    out[0] = 0; // message type
     out[1] = controls.time_usec;
     out[2] = controls.roll_ailerons;
     out[3] = controls.pitch_elevator;
@@ -170,7 +214,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 
 static void mdlTerminate(SimStruct *S)
 {
-  delete MATLink;
+  mexUnlock();
 }
 
 
