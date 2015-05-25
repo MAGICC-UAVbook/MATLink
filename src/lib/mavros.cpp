@@ -29,10 +29,7 @@
 using namespace mavros;
 using namespace mavconn;
 
-MavRos::MavRos()
-{}
-
-void MavRos::init(char* serialName) //:
+MavRos::MavRos(char* serialName) //:
 //	node_handle(nh_),
 //	mavlink_node_handle("/mavlink"), // for compatible reasons
 //	fcu_link_diag("FCU connection"),

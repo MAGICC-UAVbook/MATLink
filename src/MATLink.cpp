@@ -40,7 +40,7 @@ static void mdlInitializeSizes(SimStruct *S)
     /* Configure the input ports */
     /*****************************/
     if(!ssSetNumInputPorts(S, 1)) return;
-    ssSetInputPortWidth(S, 0, 21);
+    ssSetInputPortWidth(S, 0, 20);
     ssSetInputPortDirectFeedThrough(S, 0, 1); // we will use the input in the output step
 
     /******************************/
@@ -88,10 +88,8 @@ static void mdlStart(SimStruct *S)
 {
     mexLock();
     char port[] = "/dev/ttyUSB0";
-    mavros::MavRos* pMATLink = new mavros::MavRos();
+    mavros::MavRos* pMATLink = new mavros::MavRos(port);
     ssGetPWork(S)[0] = (void *) pMATLink;
-    pMATLink->init(port);
-    pMATLink->hil_controls_.throttle = 1.23;
 }
 #endif /*  MDL_START */
 
@@ -119,49 +117,27 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 
     InputRealPtrsType uPtrs = ssGetInputPortRealSignalPtrs(S,0); // this returns a pointer to the data on the input port;
     int_T message_type = (int_T) *uPtrs[0];
-    //vehicle_state.time_usec = (uint64_t)*uPtrs[1];
-    //vehicle_state.position[0] = *uPtrs[2];
-    //vehicle_state.position[1] = *uPtrs[3];
-    //vehicle_state.position[2] = *uPtrs[4];
-    //vehicle_state.Va =          *uPtrs[5];
-    //vehicle_state.alpha =       *uPtrs[6];
-    //vehicle_state.beta  =       *uPtrs[7];
-    //vehicle_state.phi =         *uPtrs[8];
-    //vehicle_state.theta =       *uPtrs[9];
-    //vehicle_state.psi =         *uPtrs[10];
-    //vehicle_state.chi =         *uPtrs[11];
-    //vehicle_state.p =           *uPtrs[12];
-    //vehicle_state.q =           *uPtrs[13];
-    //vehicle_state.r =           *uPtrs[14];
-    //vehicle_state.Vg =          *uPtrs[15]; 
-    //vehicle_state.wn =          *uPtrs[16];
-    //vehicle_state.we =          *uPtrs[17];
-    //vehicle_state.quat[0]     = *uPtrs[18];
-    //vehicle_state.quat[1]     = *uPtrs[19];
-    //vehicle_state.quat[2]     = *uPtrs[20];
-    //vehicle_state.quat[3]     = *uPtrs[21];
-
-    vehicle_state.time_usec = 1;
-    vehicle_state.position[0] = 1.0;
-    vehicle_state.position[1] =1.0;
-    vehicle_state.position[2] =1.0;
-    vehicle_state.Va =         1.0;
-    vehicle_state.alpha =      1.0;
-    vehicle_state.beta  =      1.0;
-    vehicle_state.phi =        1.0;
-    vehicle_state.theta =      1.0;
-    vehicle_state.psi =         1.0;
-    vehicle_state.chi =         1.0;
-    vehicle_state.p =           1.0;
-    vehicle_state.q =           1.0;
-    vehicle_state.r =           1.0;
-    vehicle_state.Vg =          1.0;
-    vehicle_state.wn =          1.0;
-    vehicle_state.we =          1.0;
-    vehicle_state.quat[0]     = 0.0;
-    vehicle_state.quat[1]     = 0.0;
-    vehicle_state.quat[2]     = 0.0;
-    vehicle_state.quat[3]     = 1.0;
+    vehicle_state.time_usec = (uint64_t)*uPtrs[19]/1000000;
+    vehicle_state.position[0] = *uPtrs[0];
+    vehicle_state.position[1] = *uPtrs[1];
+    vehicle_state.position[2] = *uPtrs[2];
+    vehicle_state.Va =          *uPtrs[3];
+    vehicle_state.alpha =       *uPtrs[4];
+    vehicle_state.beta  =       *uPtrs[5];
+    vehicle_state.phi =         *uPtrs[6];
+    vehicle_state.theta =       *uPtrs[7];
+    vehicle_state.psi =         *uPtrs[15];
+    vehicle_state.chi =         *uPtrs[8];
+    vehicle_state.p =           *uPtrs[9];
+    vehicle_state.q =           .85;//*uPtrs[10];
+    vehicle_state.r =           *uPtrs[11];
+    vehicle_state.Vg =          *uPtrs[12];
+    vehicle_state.wn =          *uPtrs[13];
+    vehicle_state.we =          *uPtrs[14];
+    vehicle_state.quat[0]     = 0;
+    vehicle_state.quat[1]     = 0;
+    vehicle_state.quat[2]     = 0;
+    vehicle_state.quat[3]     = 0;
 
     pMATLink->spinOnce(vehicle_state); // this line crashes simulink
 
