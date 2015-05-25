@@ -139,7 +139,6 @@ void MavRos::init(char* serialName) //:
 
 void MavRos::spinOnce(mavlink_hil_vehicle_state_t vs)
 {
-
 //	ros::Rate loop_rate(1000);
 //	while (node_handle.ok()) {
 //		ros::spinOnce();

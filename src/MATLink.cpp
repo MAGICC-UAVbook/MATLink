@@ -12,6 +12,7 @@
 
 #include <simstruc.h>
 #include "mavros/mavros.h"
+#include <iostream>
 
 #define NUM_PARAMS (0)
 
@@ -53,30 +54,15 @@ static void mdlInitializeSizes(SimStruct *S)
     /* specify the sim state compliance to be same as a built-in block */
     //ssSetSimStateCompliance(S, USE_DEFAULT_SIM_STATE);
 
-    mavros::MavRos* pMATLink = new mavros::MavRos();
-
     /**************************/
     /* Configure work vectors */
     /**************************/
-    DTypeId MATLINK_ID = ssRegisterDataType(S, "ml");
-    if(MATLINK_ID == INVALID_DTYPE_ID) return;
-    if(!ssSetDataTypeSize(S,MATLINK_ID,sizeof(mavros::MavRos))) return;
-    if(!ssSetDataTypeZero(S,MATLINK_ID,pMATLink)) return;
-
-    //delete pMATLink;
-
     ssSetNumDWork(S,1);
-    ssSetDWorkDataType(S,0,MATLINK_ID);
+    ssSetDWorkDataType(S,0,SS_POINTER);
     ssSetDWorkWidth(S,0,1);
 
-
-    /*******************************/
-    /* SET UP MAVLINK COMMUNICTION */
-    /*******************************/
-    char port[] = "/dev/ttyUSB0";
-    pMATLink = (mavros::MavRos*) ssGetDWork(S,0);
-    pMATLink->init(port);
-
+    // see MATLABROOT/toolbox/simulink/simdemos/simfeatures/src/sfun_counter_cpp.cpp for an example
+    ssSetNumPWork(S,1);
 
     //ssSetNumDWork(         S, 1);   /* number of DWork Vectors (persistent memory) */
     //ssSetNumRWork(         S, 0);   /* number of real work vector elements   */
@@ -96,16 +82,18 @@ static void mdlInitializeSizes(SimStruct *S)
     
 }
 
-
+#define MDL_START  /* Change to #undef to remove function */
+#if defined(MDL_START)
 static void mdlStart(SimStruct *S)
 {
     mexLock();
-    real_T *payload_data = (real_T*) ssGetDWork(S,0);
-    for(int i = 1; i<ssGetDWorkWidth(S,0);i++)
-    {
-        payload_data[i] = 0.0; // set it all to zeros to avoid weird returns
-    }
+    char port[] = "/dev/ttyUSB0";
+    mavros::MavRos* pMATLink = new mavros::MavRos();
+    ssGetPWork(S)[0] = (void *) pMATLink;
+    pMATLink->init(port);
+    pMATLink->hil_controls_.throttle = 1.23;
 }
+#endif /*  MDL_START */
 
 static void mdlInitializeSampleTimes(SimStruct *S)
 {
@@ -116,10 +104,11 @@ static void mdlInitializeSampleTimes(SimStruct *S)
 
 static void mdlOutputs(SimStruct *S, int_T tid)
 {
+    UNUSED_ARG(tid);
     /**************/
     /* Get MATLINK out of DWork */
     /**************/
-    mavros::MavRos* pMATLink = (mavros::MavRos*) ssGetDWork(S,0);
+    mavros::MavRos* pMATLink = (mavros::MavRos*) ssGetPWork(S)[0];
 
     /**************/
     /* Grab Input */
@@ -128,7 +117,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     mavlink_hil_vehicle_state_t vehicle_state;
     mavlink_hil_controls_t controls;
 
-    InputRealPtrsType uPtrs = ssGetInputPortRealSignalPtrs(S,0); // this returns a pointer to the data on the input por;
+    InputRealPtrsType uPtrs = ssGetInputPortRealSignalPtrs(S,0); // this returns a pointer to the data on the input port;
     int_T message_type = (int_T) *uPtrs[0];
     //vehicle_state.time_usec = (uint64_t)*uPtrs[1];
     //vehicle_state.position[0] = *uPtrs[2];
@@ -173,8 +162,8 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     vehicle_state.quat[1]     = 0.0;
     vehicle_state.quat[2]     = 0.0;
     vehicle_state.quat[3]     = 1.0;
-//
-    // pMATLink->spinOnce(vehicle_state); // this line crashes simulink
+
+    pMATLink->spinOnce(vehicle_state); // this line crashes simulink
 
     /************************/
     /* Receive from MAVLINK */
@@ -214,7 +203,9 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 
 static void mdlTerminate(SimStruct *S)
 {
-  mexUnlock();
+    mavros::MavRos* pMATLink = (mavros::MavRos*) ssGetPWork(S)[0];
+    delete pMATLink;
+    mexUnlock();
 }
 
 

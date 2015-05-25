@@ -44,7 +44,7 @@ ENDIF(MATLAB_FOUND)
 
 #SET(GCC_LINK_FLAGS "-fPIC")
 #SET( CMAKEMODULE_LINKER_FLAGS  "${CMAKE_MODULE_LINKER_FLAGS} ${GCC_LINK_FLAGS}" )
-SET(CMAKE_STATIC_LINKER_FLAGS "-fP")
+#SET(CMAKE_STATIC_LINKER_FLAGS "-fPIC")
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
