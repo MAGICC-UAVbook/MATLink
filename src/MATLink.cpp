@@ -15,6 +15,25 @@
 #include <iostream>
 
 #define NUM_PARAMS (0)
+//#define IS_PARAM_DOUBLE(pVal) (mxIsNumeric(pVal) && !mxIsLogical(pVal) &&\
+//!mxIsEmpty(pVal) && !mxIsSparse(pVal) && !mxIsComplex(pVal) && mxIsDouble(pVal))
+
+//#define MDL_CHECK_PARAMETERS
+//#if defined(MDL_CHECK_PARAMETERS)
+///*
+// * Check to make sure that each parameter is 1-d and positive
+// */
+//static void mdlCheckParameters(SimStruct *S)
+//{
+
+//    const mxArray *pVal0 = ssGetSFcnParam(S,0);
+
+//    if ( !IS_PARAM_DOUBLE(pVal0)) {
+//        ssSetErrorStatus(S, "Parameter to S-function must be a double scalar");
+//        return;
+//    }
+//}
+//#endif
 
 static void mdlInitializeSizes(SimStruct *S)
 {
@@ -26,7 +45,12 @@ static void mdlInitializeSizes(SimStruct *S)
     // check to make sure that the right number of parameters were passed
     if (ssGetNumSFcnParams(S) != ssGetSFcnParamsCount(S)) {
         return; /* Parameter mismatch reported by the Simulink engine*/
-    }
+    } /*else {
+        mdlCheckParameters(S);
+        if (ssGetErrorStatus(S) != NULL) {
+            return;
+        }
+    }*/
 
     /***************************************************/
     /* Take Care of the Continuous and Discrete States */
@@ -79,7 +103,6 @@ static void mdlInitializeSizes(SimStruct *S)
     // ssSetDworkDataType(S, 0, SS_DOUBLE);
     // ssSetDworkName(S, 0, "payload_data");
 
-    
 }
 
 #define MDL_START  /* Change to #undef to remove function */
@@ -95,7 +118,7 @@ static void mdlStart(SimStruct *S)
 
 static void mdlInitializeSampleTimes(SimStruct *S)
 {
-    ssSetSampleTime(S, 0, INHERITED_SAMPLE_TIME);
+    ssSetSampleTime(S, 0, INHERITED_SAMPLE_TIME);//CONTINUOUS_SAMPLE_TIME);//mxGetScalar(ssGetSFcnParam(S, 0)));
     ssSetOffsetTime(S, 0, 0.0);
     ssSetModelReferenceSampleTimeDefaultInheritance(S);
 }
@@ -104,7 +127,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 {
     UNUSED_ARG(tid);
     /**************/
-    /* Get MATLINK out of DWork */
+    /* Get MATLINK out of PWork */
     /**************/
     mavros::MavRos* pMATLink = (mavros::MavRos*) ssGetPWork(S)[0];
 
@@ -139,7 +162,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     vehicle_state.quat[2]     = 0;
     vehicle_state.quat[3]     = 0;
 
-    pMATLink->spinOnce(vehicle_state); // this line crashes simulink
+    pMATLink->spinOnce(vehicle_state);
 
     /************************/
     /* Receive from MAVLINK */
@@ -158,6 +181,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     controls.mode = pMATLink->hil_controls_.mode;
     controls.nav_mode = pMATLink->hil_controls_.nav_mode;
 
+    std::cout << pMATLink->hil_controls_.throttle << std::endl;
     /********************************************/
     /* Pack Received message into Output Vector */
     /********************************************/

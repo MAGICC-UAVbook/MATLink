@@ -2,10 +2,10 @@ function y = mavlinkReceiveControls(u,P)
 
  %message_output_type = u(1)
  %output_time = u(2)
- delta_a = u(3)
- delta_e =  u(4)
- detla_r = u(5)
- detla_t = u(6)
+ delta_a = u(3);
+ delta_e = u(4);
+ delta_r = u(5);
+ delta_t = u(6);
  h_c = 0;
  Va_c = 0;
  phi_c = 0;

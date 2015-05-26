@@ -85,8 +85,9 @@ MavRos::MavRos(char* serialName) //:
 			return;
 		}
 	}
-	else
-        std::cout << "GCS bridge disabled" << std::endl;
+    else {
+        ;//std::cout << "GCS bridge disabled" << std::endl;
+    }
 
 	// ROS mavlink bridge
     //mavlink_pub = mavlink_node_handle.advertise<Mavlink>("from", 100);
@@ -118,7 +119,7 @@ MavRos::MavRos(char* serialName) //:
 	if (px4_usb_quirk)
 		startup_px4_usb_quirk();
 
-    std::cout << "MAVROS started. MY ID [" <<  system_id << ", " << component_id << "], TARGET ID [" << tgt_system_id << ", "<< tgt_component_id << "]" <<  std::endl;
+    //std::cout << "MAVROS started. MY ID [" <<  system_id << ", " << component_id << "], TARGET ID [" << tgt_system_id << ", "<< tgt_component_id << "]" <<  std::endl;
 
     // reset the state member hil_controls so that it doesn't output weird stuff
     hil_controls_.time_usec = 0;
@@ -162,10 +163,11 @@ void MavRos::mavlink_receive(const mavlink_message_t *mmsg, uint8_t sysid, uint8
     //mavutils::copy_mavlink_to_ros(mmsg, rmsg);
     //mavlink_pub.publish(rmsg);
 
-    std::cout << "received message, id: " << (int)mmsg->msgid;
+//    std::cout << "received message, id: " << (int)mmsg->msgid;
     if(mmsg->msgid == MAVLINK_MSG_ID_HIL_CONTROLS)
     {
         mavlink_msg_hil_controls_decode(mmsg, &hil_controls_);
+//        std::cout << " throttle: " << hil_controls_.throttle << std::endl;
     }
 }
 

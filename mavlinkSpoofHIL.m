@@ -43,6 +43,5 @@ out(17) = gamma;
 out(18) = chi;
 out(19) = wn;
 out(20) = we;
-out(21) = wd;
 
 end
