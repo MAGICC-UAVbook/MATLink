@@ -22,6 +22,7 @@ int main(int argc, char* argv[])
   vehicle_state.q = 0.2;
 
   mavros::MavRos mavros(argv[1]);
+  mavlink_hil_controls_t controls;
 
   for (;;)
   {
@@ -30,6 +31,11 @@ int main(int argc, char* argv[])
         vehicle_state.q = 0;
 //    mavlink.send_vehicle_state(vehicle_state);
     mavros.spinOnce(vehicle_state);
+    std::cout << ": " << mavros.hil_controls_.roll_ailerons
+              << ", " << mavros.hil_controls_.pitch_elevator
+              << ", " << mavros.hil_controls_.yaw_rudder
+              << ", " << mavros.hil_controls_.throttle
+              << std::endl;
 
 //    mavlink_message_t msg;
 //    mavlink.check_serial(&msg);

@@ -235,20 +235,26 @@ target_link_libraries(mavros
 #  ${Boost_LIBRARIES}
 #)
 
+##############
+# standalone #
+##############
 ## Declare a cpp executable
-#add_executable(matlink_test
-#  src/matlink_test.cpp
-#)
-#add_dependencies(matlink_test
-#  mavros
-#  mavconn
-#)
-#target_link_libraries(matlink_test
-#  mavros
-##  ${catkin_LIBRARIES}
-##  ${Boost_LIBRARIES}
-#)
+add_executable(matlink_test
+  src/matlink_test.cpp
+)
+add_dependencies(matlink_test
+  mavros
+  mavconn
+)
+target_link_libraries(matlink_test
+  mavros
+#  ${catkin_LIBRARIES}
+#  ${Boost_LIBRARIES}
+)
 
+#######
+# MEX #
+#######
 
 # compile mex
 set(CPP_FILE MATLink)
