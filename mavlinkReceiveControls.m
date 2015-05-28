@@ -1,4 +1,4 @@
-function y = mavlinkReceiveControls(u,P)
+function y = mavlinkReceiveControls(u)
 
  %message_output_type = u(1)
  %output_time = u(2)
@@ -24,7 +24,7 @@ function y = mavlinkReceiveControls(u,P)
         0;...                    % alpha
         0;...                    % beta
         phi_c;...                % phi
-        theta_c*P.K_theta_DC;... % theta
+        theta_c;%*P.K_theta_DC;... % theta
         chi_c;...                % chi
         0;...                    % p
         0;...                    % q

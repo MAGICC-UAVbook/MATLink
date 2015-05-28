@@ -55,6 +55,7 @@ public:
     mavlink_hil_controls_t hil_controls_;
 
     void spinOnce(mavlink_hil_vehicle_state_t vehicle_state);
+    bool msg_received;
 private:
     //ros::NodeHandle node_handle;
     //ros::NodeHandle mavlink_node_handle;

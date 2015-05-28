@@ -133,6 +133,8 @@ MavRos::MavRos(char* serialName) //:
     hil_controls_.aux4 = 0;
     hil_controls_.mode = 0;
     hil_controls_.nav_mode = 0;
+
+    msg_received = false;
 }
 
 void MavRos::spinOnce(mavlink_hil_vehicle_state_t vs)
@@ -163,9 +165,10 @@ void MavRos::mavlink_receive(const mavlink_message_t *mmsg, uint8_t sysid, uint8
     //mavutils::copy_mavlink_to_ros(mmsg, rmsg);
     //mavlink_pub.publish(rmsg);
 
-//    std::cout << "received message, id: " << (int)mmsg->msgid;
+    //std::cout << "received message, id: " << (int)mmsg->msgid << std::endl;
     if(mmsg->msgid == MAVLINK_MSG_ID_HIL_CONTROLS)
     {
+        msg_received = true;
         mavlink_msg_hil_controls_decode(mmsg, &hil_controls_);
 //        std::cout << " throttle: " << hil_controls_.throttle << std::endl;
     }

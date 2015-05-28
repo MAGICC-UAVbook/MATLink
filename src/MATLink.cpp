@@ -181,7 +181,10 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     controls.mode = pMATLink->hil_controls_.mode;
     controls.nav_mode = pMATLink->hil_controls_.nav_mode;
 
-    std::cout << pMATLink->hil_controls_.throttle << std::endl;
+    if(pMATLink->msg_received = true) {
+        pMATLink->msg_received = false;
+        std::cout << pMATLink->hil_controls_.throttle << std::endl;
+    }
     /********************************************/
     /* Pack Received message into Output Vector */
     /********************************************/
