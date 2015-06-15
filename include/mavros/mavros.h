@@ -54,7 +54,7 @@ public:
 
     mavlink_hil_controls_t hil_controls_;
 
-    void spinOnce(mavlink_hil_vehicle_state_t vehicle_state);
+    void spinOnce(mavlink_hil_vehicle_state_t vehicle_state, mavlink_hil_controller_commands_t cc);
     bool msg_received;
 private:
     //ros::NodeHandle node_handle;
@@ -84,6 +84,7 @@ private:
 	void terminate_cb();
 	void startup_px4_usb_quirk(void);
 	void log_connect_change(bool connected);
+    int counter;
 };
 
 }; // namespace mavros

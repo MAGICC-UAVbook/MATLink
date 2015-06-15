@@ -136,6 +136,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     /**************/
 
     mavlink_hil_vehicle_state_t vehicle_state;
+    mavlink_hil_controller_commands_t controller_commands;
     mavlink_hil_controls_t controls;
 
     InputRealPtrsType uPtrs = ssGetInputPortRealSignalPtrs(S,0); // this returns a pointer to the data on the input port;
@@ -144,25 +145,29 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     vehicle_state.position[0] = *uPtrs[0];
     vehicle_state.position[1] = *uPtrs[1];
     vehicle_state.position[2] = *uPtrs[2];
-    vehicle_state.Va =          *uPtrs[3];
-    vehicle_state.alpha =       *uPtrs[4];
-    vehicle_state.beta  =       *uPtrs[5];
-    vehicle_state.phi =         *uPtrs[6];
-    vehicle_state.theta =       *uPtrs[7];
-    vehicle_state.psi =         *uPtrs[15];
-    vehicle_state.chi =         *uPtrs[8];
-    vehicle_state.p =           *uPtrs[9];
-    vehicle_state.q =           .85;//*uPtrs[10];
-    vehicle_state.r =           *uPtrs[11];
-    vehicle_state.Vg =          *uPtrs[12];
-    vehicle_state.wn =          *uPtrs[13];
-    vehicle_state.we =          *uPtrs[14];
+    vehicle_state.Va          = *uPtrs[3];
+    vehicle_state.alpha       = *uPtrs[4];
+    vehicle_state.beta        = *uPtrs[5];
+    vehicle_state.phi         = *uPtrs[6];
+    vehicle_state.theta       = *uPtrs[7];
+    vehicle_state.psi         = *uPtrs[15];
+    vehicle_state.chi         = *uPtrs[8];
+    vehicle_state.p           = *uPtrs[9];
+    vehicle_state.q           = *uPtrs[10];
+    vehicle_state.r           = *uPtrs[11];
+    vehicle_state.Vg          = *uPtrs[12];
+    vehicle_state.wn          = *uPtrs[13];
+    vehicle_state.we          = *uPtrs[14];
     vehicle_state.quat[0]     = 0;
     vehicle_state.quat[1]     = 0;
     vehicle_state.quat[2]     = 0;
     vehicle_state.quat[3]     = 0;
 
-    pMATLink->spinOnce(vehicle_state);
+    controller_commands.Va_c  = *uPtrs[16];
+    controller_commands.h_c   = *uPtrs[17];
+    controller_commands.chi_c = *uPtrs[18];
+
+    pMATLink->spinOnce(vehicle_state, controller_commands);
 
     /************************/
     /* Receive from MAVLINK */
@@ -183,7 +188,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 
     if(pMATLink->msg_received = true) {
         pMATLink->msg_received = false;
-        std::cout << pMATLink->hil_controls_.throttle << std::endl;
+        std::cout << pMATLink->hil_controls_.throttle << " " << vehicle_state.position[2] << " "  << vehicle_state.q << std::endl;
     }
     /********************************************/
     /* Pack Received message into Output Vector */
@@ -197,9 +202,9 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     out[5] = controls.throttle;
     out[6] = controls.aux1;
     out[7] = controls.aux2;
-    out[8] = controls.aux3;
-    out[9] = controls.aux4;
-    out[10] = controls.mode;
+    out[8] = controller_commands.Va_c;//controls.aux3;
+    out[9] = controller_commands.h_c;//controls.aux4;
+    out[10] = controller_commands.chi_c;//controls.mode;
     out[11] = controls.nav_mode;
 }
 

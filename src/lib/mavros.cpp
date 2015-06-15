@@ -37,6 +37,7 @@ MavRos::MavRos(char* serialName) //:
 //	plugin_loader("mavros", "mavplugin::MavRosPlugin"),
 //	message_route_table{}
 {
+    this->counter = 0;
     std::string fcu_url(serialName), gcs_url;
     int system_id = 1;
     int component_id = 1;
@@ -137,7 +138,7 @@ MavRos::MavRos(char* serialName) //:
     msg_received = false;
 }
 
-void MavRos::spinOnce(mavlink_hil_vehicle_state_t vs)
+void MavRos::spinOnce(mavlink_hil_vehicle_state_t vs, mavlink_hil_controller_commands_t cc)
 {
 //	ros::Rate loop_rate(1000);
 //	while (node_handle.ok()) {
@@ -146,9 +147,22 @@ void MavRos::spinOnce(mavlink_hil_vehicle_state_t vs)
 
 //		loop_rate.sleep();
 //	}
-    mavlink_message_t mmsg;
-    mavlink_msg_hil_vehicle_state_encode(1,1,&mmsg,&vs);
-    mavlink_send(mmsg);
+    counter++;
+    if(counter == 8)
+    {
+        mavlink_message_t mmsg;
+        mavlink_msg_hil_vehicle_state_encode(1,1,&mmsg,&vs);
+        mavlink_send(mmsg);
+    }
+
+    if(counter == 15)
+    {
+        mavlink_message_t mmsg;
+        mavlink_msg_hil_controller_commands_encode(1,1,&mmsg,&cc);
+        mavlink_send(mmsg);
+
+        counter = 0;
+    }
     //diag_updater.update();
 
 //	ROS_INFO("Stopping mavros...");
