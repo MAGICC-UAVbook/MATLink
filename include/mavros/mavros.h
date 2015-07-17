@@ -53,9 +53,14 @@ public:
     ~MavRos() {mav_uas.stop();}
 
     mavlink_hil_controls_t hil_controls_;
+    mavlink_hil_vehicle_state_t hil_vehicle_state_;
 
-    void spinOnce(mavlink_hil_vehicle_state_t vehicle_state, mavlink_hil_controller_commands_t cc);
+    void spinOnce(mavlink_hil_sensor_t sensor, mavlink_hil_gps_t gps, bool sendGPS);
     bool msg_received;
+    float gps_n_old;
+    float gps_e_old;
+    float gps_Vg_old;
+    float gps_course_old;
 private:
     //ros::NodeHandle node_handle;
     //ros::NodeHandle mavlink_node_handle;

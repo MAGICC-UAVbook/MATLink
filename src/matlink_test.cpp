@@ -35,12 +35,31 @@ int main(int argc, char* argv[])
     if(controller_commands.h_c >= 500)
         controller_commands.h_c = 5;
 //    mavlink.send_vehicle_state(vehicle_state);
-    mavros.spinOnce(vehicle_state, controller_commands);
-    std::cout << ": " << mavros.hil_controls_.roll_ailerons
-              << ", " << mavros.hil_controls_.pitch_elevator
-              << ", " << mavros.hil_controls_.yaw_rudder
-              << ", " << mavros.hil_controls_.throttle
+    mavlink_hil_sensor_t sensor;
+    mavlink_hil_gps_t gps;
+    gps.lat = 0;
+    gps.lon = 0;
+    gps.alt = 0;
+    //mavros.spinOnce(sensor, gps, false);
+    std::cout << ": " << mavros.msg_received
+              << ", " << mavros.hil_vehicle_state_.position[0]
+              << ", " << mavros.hil_vehicle_state_.position[1]
+              << ", " << mavros.hil_vehicle_state_.position[2]
+              << ", " << mavros.hil_vehicle_state_.Va
+              << ", " << mavros.hil_vehicle_state_.alpha
+              << ", " << mavros.hil_vehicle_state_.beta
+              << ", " << mavros.hil_vehicle_state_.phi
+              << ", " << mavros.hil_vehicle_state_.theta
+              << ", " << mavros.hil_vehicle_state_.psi
+              << ", " << mavros.hil_vehicle_state_.chi
+              << ", " << mavros.hil_vehicle_state_.p
+              << ", " << mavros.hil_vehicle_state_.q
+              << ", " << mavros.hil_vehicle_state_.r
+              << ", " << mavros.hil_vehicle_state_.Vg
+              << ", " << mavros.hil_vehicle_state_.wn
+              << ", " << mavros.hil_vehicle_state_.we
               << std::endl;
+    mavros.msg_received = false;
 
 //    mavlink_message_t msg;
 //    mavlink.check_serial(&msg);

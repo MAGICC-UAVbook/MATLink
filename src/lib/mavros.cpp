@@ -38,6 +38,11 @@ MavRos::MavRos(char* serialName) //:
 //	message_route_table{}
 {
     this->counter = 0;
+    this->gps_n_old = -9999;
+    this->gps_e_old = -9999;
+    this->gps_Vg_old = -9999;
+    this->gps_course_old = -9999;
+
     std::string fcu_url(serialName), gcs_url;
     int system_id = 1;
     int component_id = 1;
@@ -138,7 +143,7 @@ MavRos::MavRos(char* serialName) //:
     msg_received = false;
 }
 
-void MavRos::spinOnce(mavlink_hil_vehicle_state_t vs, mavlink_hil_controller_commands_t cc)
+void MavRos::spinOnce(mavlink_hil_sensor_t sensor, mavlink_hil_gps_t gps, bool sendGPS)
 {
 //	ros::Rate loop_rate(1000);
 //	while (node_handle.ok()) {
@@ -147,18 +152,15 @@ void MavRos::spinOnce(mavlink_hil_vehicle_state_t vs, mavlink_hil_controller_com
 
 //		loop_rate.sleep();
 //	}
-    counter++;
-    if(counter == 8)
-    {
-        mavlink_message_t mmsg;
-        mavlink_msg_hil_vehicle_state_encode(1,1,&mmsg,&vs);
-        mavlink_send(mmsg);
-    }
+    mavlink_message_t mmsg;
+    mavlink_msg_hil_sensor_encode(1,1,&mmsg,&sensor);
+    mavlink_send(mmsg);
 
-    if(counter == 15)
+
+    if(sendGPS)
     {
         mavlink_message_t mmsg;
-        mavlink_msg_hil_controller_commands_encode(1,1,&mmsg,&cc);
+        mavlink_msg_hil_gps_encode(1,1,&mmsg,&gps);
         mavlink_send(mmsg);
 
         counter = 0;
@@ -179,13 +181,25 @@ void MavRos::mavlink_receive(const mavlink_message_t *mmsg, uint8_t sysid, uint8
     //mavutils::copy_mavlink_to_ros(mmsg, rmsg);
     //mavlink_pub.publish(rmsg);
 
-    //std::cout << "received message, id: " << (int)mmsg->msgid << std::endl;
-    if(mmsg->msgid == MAVLINK_MSG_ID_HIL_CONTROLS)
+    std::cout << "received message, id: " << (int)mmsg->msgid << std::endl;
+//    if(mmsg->msgid == MAVLINK_MSG_ID_HIL_CONTROLS)
+//    {
+//        msg_received = true;
+//        mavlink_msg_hil_controls_decode(mmsg, &hil_controls_);
+////        std::cout << " throttle: " << hil_controls_.throttle << std::endl;
+//    }
+    if(mmsg->msgid == MAVLINK_MSG_ID_HIL_VEHICLE_STATE)
     {
         msg_received = true;
-        mavlink_msg_hil_controls_decode(mmsg, &hil_controls_);
-//        std::cout << " throttle: " << hil_controls_.throttle << std::endl;
+        mavlink_msg_hil_vehicle_state_decode(mmsg, &hil_vehicle_state_);
+        //std::cout << " p: " << hil_vehicle_state_.p << std::endl;
     }
+//    if(mmsg->msgid == MAVLINK_MSG_ID_STATUSTEXT)
+//    {
+//        mavlink_statustext_t stat;
+//        mavlink_msg_statustext_decode(mmsg, &stat);
+//        std::cout << stat.text << std::endl;
+//    }
 }
 
 void MavRos::mavlink_send(mavlink_message_t mmsg) {
