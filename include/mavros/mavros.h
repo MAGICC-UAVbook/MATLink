@@ -55,12 +55,12 @@ public:
     mavlink_hil_controls_t hil_controls_;
     mavlink_hil_vehicle_state_t hil_vehicle_state_;
 
-    void spinOnce(mavlink_hil_sensor_t sensor, mavlink_hil_gps_t gps, bool sendGPS);
+    void spinOnce(mavlink_new_waypoint_t nwp);
     bool msg_received;
-    float gps_n_old;
-    float gps_e_old;
-    float gps_Vg_old;
-    float gps_course_old;
+    float wp_n_old;
+    float wp_e_old;
+    float wp_Va_old;
+    float wp_course_old;
 private:
     //ros::NodeHandle node_handle;
     //ros::NodeHandle mavlink_node_handle;

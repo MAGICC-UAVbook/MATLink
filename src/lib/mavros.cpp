@@ -37,11 +37,6 @@ MavRos::MavRos(char* serialName) //:
 //	plugin_loader("mavros", "mavplugin::MavRosPlugin"),
 //	message_route_table{}
 {
-    this->counter = 0;
-    this->gps_n_old = -9999;
-    this->gps_e_old = -9999;
-    this->gps_Vg_old = -9999;
-    this->gps_course_old = -9999;
 
     std::string fcu_url(serialName), gcs_url;
     int system_id = 1;
@@ -143,7 +138,7 @@ MavRos::MavRos(char* serialName) //:
     msg_received = false;
 }
 
-void MavRos::spinOnce(mavlink_hil_sensor_t sensor, mavlink_hil_gps_t gps, bool sendGPS)
+void MavRos::spinOnce(mavlink_new_waypoint_t nwp)
 {
 //	ros::Rate loop_rate(1000);
 //	while (node_handle.ok()) {
@@ -153,18 +148,9 @@ void MavRos::spinOnce(mavlink_hil_sensor_t sensor, mavlink_hil_gps_t gps, bool s
 //		loop_rate.sleep();
 //	}
     mavlink_message_t mmsg;
-    mavlink_msg_hil_sensor_encode(1,1,&mmsg,&sensor);
+    mavlink_msg_new_waypoint_encode(1,1,&mmsg,&nwp);
     mavlink_send(mmsg);
 
-
-    if(sendGPS)
-    {
-        mavlink_message_t mmsg;
-        mavlink_msg_hil_gps_encode(1,1,&mmsg,&gps);
-        mavlink_send(mmsg);
-
-        counter = 0;
-    }
     //diag_updater.update();
 
 //	ROS_INFO("Stopping mavros...");

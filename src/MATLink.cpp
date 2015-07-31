@@ -158,31 +158,31 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     float gps_Vg              = *uPtrs[11];
     float gps_course          = *uPtrs[12];
 
-    if(gps_n != pMATLink->gps_n_old || gps_e != pMATLink->gps_e_old || gps_Vg != pMATLink->gps_Vg_old)// || gps_course != pMATLink->gps_course_old)
-    {
-        float conversion = (3.14159/(180*1e7)); //from 1/10th of a micro degree to radian
-        gps.lat = gps_n / EARTH_RADIUS / conversion;
-        gps.lon = gps_e / EARTH_RADIUS / conversion;
-        gps.alt = gps_h / 1e-3f;
-        gps.vel = gps_Vg / 1e-2f;
-        gps.vn = 0;
-        gps.ve = 0;
-        gps.vd = 0;
-        if(gps_course < 0)
-            gps_course += 2*3.14159;
-        gps.cog = gps_course * M_RAD_TO_DEG_F / 1e-2f;
-        std::cout << "gps course: " << gps_course << std::endl;
-        gps.fix_type = 3;
+//    if(gps_n != pMATLink->gps_n_old || gps_e != pMATLink->gps_e_old || gps_Vg != pMATLink->gps_Vg_old)// || gps_course != pMATLink->gps_course_old)
+//    {
+//        float conversion = (3.14159/(180*1e7)); //from 1/10th of a micro degree to radian
+//        gps.lat = gps_n / EARTH_RADIUS / conversion;
+//        gps.lon = gps_e / EARTH_RADIUS / conversion;
+//        gps.alt = gps_h / 1e-3f;
+//        gps.vel = gps_Vg / 1e-2f;
+//        gps.vn = 0;
+//        gps.ve = 0;
+//        gps.vd = 0;
+//        if(gps_course < 0)
+//            gps_course += 2*3.14159;
+//        gps.cog = gps_course * M_RAD_TO_DEG_F / 1e-2f;
+//        std::cout << "gps course: " << gps_course << std::endl;
+//        gps.fix_type = 3;
 
-        pMATLink->gps_n_old = gps_n;
-        pMATLink->gps_e_old = gps_e;
-        pMATLink->gps_Vg_old = gps_Vg;
-        pMATLink->gps_course_old = gps_course;
+//        pMATLink->gps_n_old = gps_n;
+//        pMATLink->gps_e_old = gps_e;
+//        pMATLink->gps_Vg_old = gps_Vg;
+//        pMATLink->gps_course_old = gps_course;
 
-        pMATLink->spinOnce(sensor, gps, true);
-    }
-    else
-        pMATLink->spinOnce(sensor, gps, false);
+//        pMATLink->spinOnce(sensor, gps, true);
+//    }
+//    else
+//        pMATLink->spinOnce(sensor, gps, false);
 
     /************************/
     /* Receive from MAVLINK */
