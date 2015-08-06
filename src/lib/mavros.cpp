@@ -181,7 +181,7 @@ void MavRos::mavlink_receive(const mavlink_message_t *mmsg, uint8_t sysid, uint8
     //mavutils::copy_mavlink_to_ros(mmsg, rmsg);
     //mavlink_pub.publish(rmsg);
 
-    std::cout << "received message, id: " << (int)mmsg->msgid << std::endl;
+    //std::cout << "received message, id: " << (int)mmsg->msgid << std::endl;
 //    if(mmsg->msgid == MAVLINK_MSG_ID_HIL_CONTROLS)
 //    {
 //        msg_received = true;
