@@ -58,28 +58,28 @@ int main(int argc, char* argv[])
         std::cout << ", e position " << mavros.hil_vehicle_state_.position[1] << std::endl;
         break;
     case 2:
-        std::cout << ", height " << mavros.hil_vehicle_state_.position[2] << std::endl;
+        std::cout << ", height " << mavros.hil_vehicle_state_.position[2] << ", Va " << mavros.hil_vehicle_state_.Va << std::endl;
         break;
     case 3:
         std::cout << ", Va " << mavros.hil_vehicle_state_.Va << std::endl;
         break;
     case 4:
-        std::cout << ", alpha " << mavros.hil_vehicle_state_.alpha << std::endl;
+        std::cout << ", alpha " << mavros.hil_vehicle_state_.alpha*180/3.14159 << std::endl;
         break;
     case 5:
-        std::cout << ", beta " << mavros.hil_vehicle_state_.beta << std::endl;
+        std::cout << ", beta " << mavros.hil_vehicle_state_.beta*180/3.14159 << std::endl;
         break;
     case 6:
-        std::cout << ", phi " << mavros.hil_vehicle_state_.phi << std::endl;
+        std::cout << ", phi " << mavros.hil_vehicle_state_.phi*180/3.14159 << std::endl;
         break;
     case 7:
-        std::cout << ", theta " << mavros.hil_vehicle_state_.theta << std::endl;
+        std::cout << ", theta " << mavros.hil_vehicle_state_.theta*180/3.14159 << std::endl;
         break;
     case 8:
-        std::cout << ", psi " << mavros.hil_vehicle_state_.psi << std::endl;
+        std::cout << ", psi " << mavros.hil_vehicle_state_.psi*180/3.14159 << std::endl;
         break;
     case 9:
-        std::cout << ", chi " << mavros.hil_vehicle_state_.chi << std::endl;
+        std::cout << ", chi " << mavros.hil_vehicle_state_.chi*180/3.14159 << std::endl;
         break;
     case 10:
         std::cout << ", p " << mavros.hil_vehicle_state_.p << std::endl;
