@@ -20,12 +20,18 @@ int main(int argc, char* argv[])
     // message to send waypoint data
     mavlink_new_waypoint_t new_waypoint;
 
-    float Va = 11;
+    float Va = 9.5;//11;
+//    float wps[5*num_waypoints] = {
+//            0, 0, -100, 0, Va,
+//            300, 0, -100, 45*M_PI/180, Va,
+//            0, 300, -100, 45*M_PI/180, Va,
+//            300, 300, -100, -135*M_PI/180, Va,
+//           };
     float wps[5*num_waypoints] = {
             0, 0, -100, 0, Va,
-            300, 0, -100, 45*M_PI/180, Va,
-            0, 300, -100, 45*M_PI/180, Va,
-            300, 300, -100, -135*M_PI/180, Va,
+            -175, 0, -100, -135*M_PI/180, Va,
+            0, -175, -100, -135*M_PI/180, Va,
+            -175, -175, -100, 45*M_PI/180, Va,
            };
 
     mavros::MavRos mavros(argv[1]);
