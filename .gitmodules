@@ -1,3 +1,0 @@
-[submodule "include/mavlink/v1.0"]
-	path = include/mavlink/v1.0
-	url = https://github.com/magicc-uavbook/mavlink_c_library.git
