@@ -28,10 +28,10 @@ int main(int argc, char* argv[])
 //            300, 300, -100, -135*M_PI/180, Va,
 //           };
     float wps[5*num_waypoints] = {
-            0, 0, -25, 0, Va,
-            -175, 0, -25, -135*M_PI/180, Va,
-            0, -175, -25, -135*M_PI/180, Va,
-            -175, -175, -25, 45*M_PI/180, Va,
+            -10, -10, -30, -45, Va,
+            -10, -125, -30, -135*M_PI/180, Va,
+            -125, -10, -30, 45*M_PI/180, Va,
+            -125, -125, -30, 135*M_PI/180, Va,
            };
 
     mavros::MavRos mavros(argv[1]);
@@ -42,9 +42,9 @@ int main(int argc, char* argv[])
         new_waypoint.w[1] = wps[i*5 + 1];
         new_waypoint.w[2] = wps[i*5 + 2];
         new_waypoint.chi_d = wps[i*5 + 3];
-        if(fabs(wps[i*5 + 3]) < 2*M_PI)
-            new_waypoint.chi_valid = true;
-        else
+//        if(fabs(wps[i*5 + 3]) < 2*M_PI)
+//            new_waypoint.chi_valid = true;
+//        else
             new_waypoint.chi_valid = false;
         new_waypoint.Va_d = wps[i*5 + 4];
 
